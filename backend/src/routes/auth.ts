@@ -2,21 +2,21 @@ import { Request, Response } from "express";
 
 const authHandler = (req: Request, res: Response) => {
 
-    console.log('req', req);
-    console.log('req.body', req.body);
-    const auth = { login: "username", password: "password" }; // change this
+    const auth = { login: "aman", password: "aman" }; // change this
 
     // parse login and password from headers
     const b64auth = (req.headers.authorization || "").split(" ")[1] || "";
-    // const [login, password] = Buffer.from(b64auth, "base64")
-    //     .toString()
-    //     .split(":");
-    const [login, password] = b64auth.toString().split(":");
+    const [user, password] = Buffer.from(b64auth, "base64")
+        .toString()
+        .split(":");
+    console.log("[user, password]:", user, password);
 
     // Verify login and password are set and correct
-    if (login && password && login === auth.login && password === auth.password) {
+    if (user && password && user === auth.login && password === auth.password) {
         // Access granted...
-        return "next()";
+        res.cookie('rememberme', '1', { expires: new Date(Date.now() + 900000), httpOnly: true });
+        res.status(200).send("Authentication done!.");
+        return;
     }
 
     // Access denied...
